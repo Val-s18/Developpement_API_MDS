@@ -1,0 +1,11 @@
+{
+  "name": "api-terrain-de-badminton",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node --watch ./bin/www"
+  },
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
