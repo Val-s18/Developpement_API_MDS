@@ -1,7 +1,25 @@
-// app.js
-const express = require("express");
-const app = express();
+var express = require("express");
+var path = require("path");
+var cookieParser = require("cookie-parser");
+var logger = require("morgan");
 
-// ... configuration de l'application, middleware, routes, etc. ...
+// Importe mes routeurs
+var routerTerrains = require("./routes/terrains");
+var routerReservations = require("./routes/reservations");
+var routerLogin = require("./routes/login");
 
-module.exports = app; // Assurez-vous que l'application est exportée
+var app = express();
+
+// Middlewares
+app.use(logger("dev"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
+
+// Enregistrer les routeurs avec leurs routes de base
+app.use(routerTerrains, routerLogin, routerReservations);
+
+// app.use(routerReservations);
+
+module.exports = app;
