@@ -1,17 +1,70 @@
 # Developpement_API_MDS
 
-## Lancer le Project
+Ce projet consiste à créer une API pour la gestion de terrains de badminton, avec des fonctionnalités de réservation et d'administration.
 
-`npm install`
+## Lancer le projet
 
-`npm run start`
+Pour démarrer le projet, exécutez les commandes suivantes :
+
+```bash
+npm install
+
+npm run start
+```
 
 Table des matières
 
-1.  [Qu'est-ce que le Markdown ?](#whatismarkdown)
-2.  [Pourquoi utiliser le Markdown?](#why)
-3.  [Outils pour le Markdown](#tools)
-4.  [La syntaxe du Markdown](#syntax)
+- [Developpement\_API\_MDS](#developpement_api_mds)
+  - [Lancer le projet](#lancer-le-projet)
+  - [requette curl pour tester le projet](#requette-curl-pour-tester-le-projet)
+  - [Spécification du projet](#spécification-du-projet)
+- [Document de conception](#document-de-conception)
+  - [Dictionnaire des données](#dictionnaire-des-données)
+  - [Liste des resources](#liste-des-resources)
+  - [Sécurité](#sécurité)
+  - [Documentation](#documentation)
+  - [Mon ressenti sur le projet](#mon-ressenti-sur-le-projet)
+
+## requette curl pour tester le projet
+
+requete qui permet de récupérer la liste des terrains
+
+```bash
+curl -X GET http://localhost:3000/terrains
+```
+
+requete qui permet de crée un terrain avec un post et authentification
+
+```bash
+// curl -X POST http://localhost:3000/terrains \
+// -H "Content-Type: application/json" \
+// -H "Authorization: Bearer <ton_token_jwt>" \
+// -d '{"nom":"terrain1","description":"terrain A","date":"2022-01-01","status":"Disponible"}'
+```
+
+requete qui permet de supprimer un terrain avec un delete et authentification si in terrain est indisponilbe
+
+```bash
+// curl -X DELETE http://localhost:3000/terrains/1 \
+// -H "Authorization: Bearer <ton_token_jwt>"
+
+```
+
+requete post qui permet de se connecter
+
+```bash
+ curl -X POST http://localhost:3000/login \
+ -H "Content-Type: application/json" \
+-d '{"pseudo": "pseudo1", "psw": "1234"}'
+
+```
+
+requete post qui permet de se connecter et de reservé un terrain avec le nom et une date
+
+```bash
+curl -X POST http://localhost:3000/terrains/1/reservations -H "Content-Type: application/json" -d '{"nom":"reservation","date":"2022-01-01"}'
+
+```
 
 ## Spécification du projet
 
@@ -65,4 +118,40 @@ le terrain B a un probleme d'étenchéité donc il ne peut pas être réservév 
 | Ajouter une réservation          | /terrains/{id terrain}/reservation/{id} | POST, HEAD, OPTIONS      | x      | Crée une réservation pour un terrain existant.               |
 | Supprimer une réservation        | /terrains/{id terrain}/reservation/{id} | DELETE, HEAD, OPTIONS    | x      | Supprime une réservation spécifique pour un terrain.         |
 
+## Sécurité
+
+En termes de sécurité :
+
+- Pour la connexion, j'ai utilisé le middleware `checkTokenMiddleware` qui vérifie que le token est valide et que l'utilisateur est authentifié.
+- J'ai aussi ajouté une boucle de **rate limit** pour limiter le nombre de connexions par IP.
+- J'ai ajouté une protection pour la création et pour l'indisponibilité d'un terrain, qui vérifie que le terrain n'est pas déjà disponible et qu'il n'est pas déjà créé.
+- J'ai ajouté une **whitelist** et une **blacklist** : une pour les administrateurs et une autre pour les personnes non autorisées à accéder à l'admin, qui sont considérées comme indésirables. Ces vérifications sont ajoutées au niveau du login.
+- J'ai ajouté un gestionnaire de processus Node.js avec cette ligne de commande qui permet de lancer, arrêter et redémarrer le projet facilement. Il permet aussi de surveiller les performances :
+
+  ```bash
+  pm2 start app.js --env production
+  ```
+
 ## Documentation
+
+En termes de documentation :
+
+- Je me suis beaucoup aidé du cours et du projet réalisé en cours, disponible sur [GitHub](https://github.com/).
+- Pour le Markdown, j'ai utilisé ce site : [Framasoft - Markdown](https://docs.framasoft.org/fr/grav/markdown.html).
+- Pour le code, j'ai consulté la documentation de [MDN Web Docs](https://developer.mozilla.org/fr/docs/Web/JavaScript).
+- Je suis retourné sur le site HAL pour consulter la documentation.
+- J'ai aussi consulté la documentation d'[Express.js](https://expressjs.com/fr/).
+- J'ai ajouté une fonctionnalité de protection pour la connexion, avec une **rate limit** qui bloque les tentatives après 5 essais. L'utilisateur doit attendre 15 minutes avant de réessayer. Pour cela, j'ai aussi consulté la documentation d'Express.
+- La documentation que j'ai utilisée pour le gestionnaire de processus Node.js est [PM2](https://alerty.ai/blog/node-pm2).
+
+## Mon ressenti sur le projet
+
+Mon ressenti sur le projet est que j'ai pu réaliser un projet qui me permet de comprendre le fonctionnement d'une API REST. Cela m'a également permis de découvrir de nouvelles choses par moi-même en explorant les différentes documentations fournies.
+
+J'ai eu un peu de mal à mettre en place le système de réservation, mais j'y suis parvenu à la fin, avec un système de réservation qui fonctionne et respecte les consignes données. Je suis donc content du résultat final.
+
+Toutes les fonctionnalités fonctionnent et toutes les commandes ont été détaillées dans la documentation.
+
+Je voulais ajouter que la conception était la partie qui me faisait le plus peur, mais en suivant ce qu'on a vu en cours, tout s'est plutôt bien passé. Je me suis rendu compte par la suite que cette étape de conception m'a bien aidé dans le reste du projet.
+
+J'ai aussi mieux compris le fonctionnement du WebToken et du login, qui me paraissaient un peu abstraits au début.

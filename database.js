@@ -3,7 +3,6 @@
 
 var bcrypt = require("bcrypt");
 
-//Salt pour le hashage des mots de passe
 const saltOrRounds = 10;
 
 class Utilisateur {

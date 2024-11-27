@@ -24,14 +24,10 @@ function halLinkObject(
 }
 
 function mapTerrainToListResourceObject(terrains) {
-  //Préparer les concerts "embarqués" comme ressource
-  //par la ressource "La liste des concerts à venir"
-
   const embedded = terrains.map((terrain) =>
     mapTerrainToResourceObject(terrain)
   );
 
-  //La liste des concerts à venir
   return {
     _links: {
       self: halLinkObject("/terrains"),
@@ -51,9 +47,9 @@ function mapTerrainToListResourceObject(terrains) {
 function mapTerrainToResourceObject(TerraintData) {
   return {
     _links: {
-      self: halLinkObject(`/terrain/${TerraintData.id}`), // Correction ici
-      // terrain: halLinkObject("/terrain"), // Correction ici
-      reservation: halLinkObject(`/terrain/${TerraintData.id}/reservations`), // Correction ici
+      self: halLinkObject(`/terrain/${TerraintData.id}`),
+
+      reservation: halLinkObject(`/terrain/${TerraintData.id}/reservations`),
     },
     // Données du terrain:
     description: TerraintData.description,

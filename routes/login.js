@@ -5,6 +5,7 @@ var database = require("../database");
 var hal = require("../hal");
 var bcrypt = require("bcrypt");
 var jwt = require("../jwt");
+const rateLimit = require("express-rate-limit");
 
 /**
  * Retourne vrai si l'user est authentifié par le système, faux sinon
@@ -13,14 +14,8 @@ var jwt = require("../jwt");
  * @returnsbcrypt
  */
 
-// curl login  curl -X POST http://localhost:3000/login \
-// -H "Content-Type: application/json" \
-// -d '{"pseudo": "pseudo1", "psw": "1234"}'
-
 function isAuthentificated(login, password) {
   const user = database.utilisateurs.find((user) => {
-    //compareSync(password en clair, password hashé en base)
-
     return user.pseudo === login && bcrypt.compareSync(password, user.psw);
   });
 
@@ -43,9 +38,26 @@ function isAdmin(pseudo) {
   return user && user.isAdmin;
 }
 
-router.post("/login", (req, res, next) => {
+// ajout d'une boucle de rateLimit pour limiter le nombre de connexion par IP
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: "Trop de tentatives de connexion. Essayez plus tard.",
+});
+
+const whiteList = ["admybad"];
+const blackList = ["pseudo2"];
+
+router.post("/login", loginLimiter, (req, res, next) => {
   const login = req.body.pseudo;
   const password = req.body.psw;
+
+  // j'ai mis le pseudo par simplicité et pour comprendre comment ça fonctionne mais le mieux est de passer par le password
+
+  if (blackList.includes(login)) {
+    return res.status(403).send("Accès interdit : IP bloquée");
+  }
 
   const isAuthAsAdmin = isAuthentificated(login, password) && isAdmin(login);
 
@@ -65,6 +77,7 @@ router.post("/login", (req, res, next) => {
   }
 
   //User est authentifié et admin: Génération d'un JSON Web Token
+
   const accessToken = jwt.createJWT(login, true, "1 day");
 
   let responseObject = {
@@ -82,11 +95,13 @@ router.post("/login", (req, res, next) => {
     message: `Bienvenue ${login} !`,
   };
 
-  return res.status(200).format({
-    "application/hal+json": function () {
-      res.send(responseObject);
-    },
-  });
+  if (whiteList.includes(login)) {
+    return res.status(200).format({
+      "application/hal+json": function () {
+        res.send(responseObject);
+      },
+    });
+  }
 });
 
 module.exports = router;

@@ -18,8 +18,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Enregistrer les routeurs avec leurs routes de base
-app.use(routerTerrains, routerLogin, routerReservations);
 
-// app.use(routerReservations);
+app.use(routerTerrains, routerLogin, routerReservations);
 
 module.exports = app;
