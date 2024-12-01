@@ -62,7 +62,13 @@ requete post qui permet de se connecter
 requete post qui permet de se connecter et de reservé un terrain avec le nom et une date
 
 ```bash
-curl -X POST http://localhost:3000/terrains/1/reservations -H "Content-Type: application/json" -d '{"nom":"reservation","date":"2022-01-01"}'
+curl -X POST http://localhost:3000/terrains/1/reservations \
+-H "Content-Type: application/json" \
+-d '{
+  "nom": "Jean Dupont",
+  "date": "2024-12-05",
+  "heure": "14:00"
+}'
 
 ```
 
